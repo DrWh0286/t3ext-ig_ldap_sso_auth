@@ -48,7 +48,7 @@ class LdapSuggestElement extends AbstractFormElement
 
         $resultArray = $baseElement->render();
 
-        $serverType = (int)$this->data['databaseRow']['ldap_server'][0];
+        $serverType = (int)($this->data['databaseRow']['ldap_server'][0] ?? 0);
 
         if (substr($this->data['fieldName'], -7) === '_basedn') {
             $suggestion = $this->suggestBaseDn();

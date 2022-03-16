@@ -43,9 +43,9 @@ class IconFactory
         if (GeneralUtility::inList('be_groups,be_users,fe_groups,fe_users', $table)) {
             if (!array_key_exists('tx_igldapssoauth_dn', $row)) {
                 // This is the case, e.g., in Backend users module
-                $row = \TYPO3\CMS\Backend\Utility\BackendUtility::getRecord($table, $row['uid']);
+                $row = \TYPO3\CMS\Backend\Utility\BackendUtility::getRecord($table, $row['uid'] ?? 0);
             }
-            if (!empty($row['tx_igldapssoauth_dn']) && !(bool)$row['disable']) {
+            if (!empty($row['tx_igldapssoauth_dn']) && !(bool)($row['disable'] ?? false)) {
                 $iconName = 'extensions-ig_ldap_sso_auth-overlay-ldap-record';
             }
         }
