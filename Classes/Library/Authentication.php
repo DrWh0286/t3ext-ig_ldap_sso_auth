@@ -15,8 +15,10 @@
 namespace Causal\IgLdapSsoAuth\Library;
 
 use Causal\IgLdapSsoAuth\Domain\Repository\ConfigurationRepository;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Http\ApplicationType;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Routing\PageArguments;
 use TYPO3\CMS\Core\TypoScript\TemplateService;
@@ -897,8 +899,7 @@ class Authentication
      */
     protected static function getCreationUserId(): int
     {
-        $cruserId = (TYPO3_MODE === 'BE' ? $GLOBALS['BE_USER']->user['uid'] : null);
-        return $cruserId ?? 0;
+        return (int)(self::isBEMode() ? self::getBEUserId() : 0);
     }
 
     /**
@@ -931,6 +932,28 @@ class Authentication
             $logger = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Log\LogManager::class)->getLogger(__CLASS__);
         }
         return $logger;
+    }
+
+    private static function isBEMode(): bool
+    {
+        $isBEMode = false;
+
+        if (($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface) {
+            $applicationType = ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST']);
+            $isBEMode = $applicationType->isBackend();
+        }
+
+        return $isBEMode;
+    }
+
+    private static function getBEUserId(): int
+    {
+        if (isset($GLOBALS['BE_USER'])) {
+            $user = $GLOBALS['BE_USER']->user;
+            return (int)($user['uid'] ?? 0);
+        }
+
+        return 0;
     }
 
 }
